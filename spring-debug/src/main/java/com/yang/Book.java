@@ -1,12 +1,14 @@
 package com.yang;
 
+import org.springframework.beans.factory.FactoryBean;
+
 /**
  * @author yangchuantang
  * @email uct20210715@163.com
  * @date 2022/5/7
  */
 
-public class Book {
+public class Book extends Book0 implements FactoryBean {
 	private String name;
 	private String id;
 
@@ -33,5 +35,20 @@ public class Book {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@Override
+	public Object getObject() throws Exception {
+		return null;
+	}
+
+	@Override
+	public Class<?> getObjectType() {
+		return null;
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return FactoryBean.super.isSingleton();
 	}
 }

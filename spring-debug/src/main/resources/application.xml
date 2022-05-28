@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
+	<context:component-scan base-package="com.yang"/>
 	<beans>
 
-		<bean id="1" name="book" class="com.yang.Book">
+		<bean id="book"  class="com.yang.Book" parent="book0" scope="singleton" init-method="getObject" >
 			<property name="id" value="2301180232"/>
 			<property name="name" value="一千零一夜"/>
+		</bean>
+
+		<bean id="book0"  class="com.yang.Book0" >
 		</bean>
 
 		<bean class="com.yang.MyBeanDefinitionRegistryPostProcessor"></bean>

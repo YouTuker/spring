@@ -133,9 +133,11 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 		Executor executor = getTaskExecutor();
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
 			if (executor != null) {
+				// 如果executor不为空，则使用executor调用监听器
 				executor.execute(() -> invokeListener(listener, event));
 			}
 			else {
+				// 否则直接调用监听器
 				invokeListener(listener, event);
 			}
 		}

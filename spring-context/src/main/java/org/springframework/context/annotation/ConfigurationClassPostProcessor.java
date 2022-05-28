@@ -265,12 +265,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * {@link Configuration} classes.
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
-		// 创建存放BeanDefinitionHolder的对象集合
+		// 创建存放 BeanDefinitionHolder 的对象集合,存放配置类的集合
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
-		// 当前registry就是DefaultListableBeanFactory,获取所有已经注册的beanDefinition的BeanName
+		// 当前 registry 就是 DefaultListableBeanFactory , 获取所有已经注册的 beanDefinition 的 BeanName
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
-		// 遍历所有要处理的beanDefinition的名称，筛选对应的BeanDefinition(被注解修饰的)
+		// 遍历所有要处理的 beanDefinition 的名称，筛选对应的 BeanDefinition (被注解修饰的)
 		for (String beanName : candidateNames) {
 			// 获得指定名称的BeanDefinition对象
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
@@ -280,10 +280,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
-			// 判断当前BeanDefinition是否是一个配置类，并为BeanDefinition设置属性为lite或则full,此处设置属性值是为了后续进行调用
-			// 如果Configuration配置proxyBeanMethods代理为true则为full
-			// 如果加了@Bean,@Component,@ComponentScan,@import,@ImportResource注解，则设置为lite
-			// 如果配置类上被@Order注解标注，则设置为BeanDefinition的Order属性值
+			// 判断当前 BeanDefinition 是否是一个配置类，并为 BeanDefinition 设置属性为 lite 或则 full ,此处设置属性值是为了后续进行调用
+			// 如果 Configuration 配置 proxyBeanMethods 代理为 true 则为 full
+			// 如果加了 @Bean , @Component , @ComponentScan , @import, @ImportResource 注解，则设置为 lite
+			// 如果配置类上被 @Order 注解标注，则设置为 BeanDefinition 的 Order 属性值
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				// 添加到相应的集合对象中，表明是一个配置类
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
@@ -296,6 +296,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Sort by previously determined @Order value, if applicable
+		// 配置类排序
 		configCandidates.sort((bd1, bd2) -> {
 			int i1 = ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());
 			int i2 = ConfigurationClassUtils.getOrder(bd2.getBeanDefinition());
@@ -329,19 +330,20 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
-		// 实例化ConfigurationClassParser类，并初始化相关参数，完成配置类的解析工作
+		// 实例化 ConfigurationClassParser 类，并初始化相关参数，完成配置类的解析工作
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 
 		// 创建两个集合对象
-		// 存放相关的BeanDefinitionHolder对象
+		// 存放相关的 BeanDefinitionHolder 对象
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		// 存放扫描包下的所有bean
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 
 		do {
-			// 解析带有@Controller,@import,@ImportResource,@ComponentScan,@ComponentScans,@Bean的BeanDefinition
+			// 解析带有@Controller, @import, @ImportResource, @ComponentScan, @ComponentScans, @Bean 的 BeanDefinition
+			// todo
 			parser.parse(candidates);
 			// 将解析完的Configuration的配置类进行校验.    1.配置类不能是final   2.@Bean修饰方法必须可以重写以支持CGLIB
 			parser.validate();

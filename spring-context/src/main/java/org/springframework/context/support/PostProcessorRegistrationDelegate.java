@@ -50,6 +50,7 @@ import org.springframework.lang.Nullable;
 final class PostProcessorRegistrationDelegate {
 
 
+
 	private PostProcessorRegistrationDelegate() {
 	}
 
@@ -85,7 +86,7 @@ final class PostProcessorRegistrationDelegate {
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the bean factory post-processors apply to them!
 			// Separate between BeanDefinitionRegistryPostProcessors that implement
-			// PriorityOrdered, Ordered, and the rest./
+			// PriorityOrdered, Ordered, and the rest.
 			// 用于保存本次要执行的BeanDefinitionRegistryPostProcessor
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();//实现了优先级接口的
 

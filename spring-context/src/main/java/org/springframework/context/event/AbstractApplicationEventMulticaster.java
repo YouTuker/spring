@@ -63,14 +63,18 @@ import org.springframework.util.ObjectUtils;
 public abstract class AbstractApplicationEventMulticaster
 		implements ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
 
+	// 创建监听助手类，用于存放应用程序的监听器集合，参数是否是预过滤监听器为false
 	private final DefaultListenerRetriever defaultRetriever = new DefaultListenerRetriever();
 
 	final Map<ListenerCacheKey, CachedListenerRetriever> retrieverCache = new ConcurrentHashMap<>(64);
 
+	// 类加载器
 	@Nullable
 	private ClassLoader beanClassLoader;
 
+
 	@Nullable
+	// ioc容器工厂类
 	private ConfigurableBeanFactory beanFactory;
 
 
@@ -468,7 +472,9 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	private class DefaultListenerRetriever {
 
+
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
+
 
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
