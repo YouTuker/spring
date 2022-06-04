@@ -281,6 +281,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	@Override
 	public void copyConfigurationFrom(ConfigurableBeanFactory otherFactory) {
+
 		super.copyConfigurationFrom(otherFactory);
 		if (otherFactory instanceof AbstractAutowireCapableBeanFactory) {
 			AbstractAutowireCapableBeanFactory otherAutowireFactory =
