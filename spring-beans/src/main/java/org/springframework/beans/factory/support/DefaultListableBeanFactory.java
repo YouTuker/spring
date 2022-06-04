@@ -892,14 +892,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 									isEagerInit = AccessController.doPrivileged(
 											(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
 									getAccessControlContext());
-						}
-						else {
-							isEagerInit = (factory instanceof SmartFactoryBean &&
-									((SmartFactoryBean<?>) factory).isEagerInit());
-						}
-						if (isEagerInit) {
-							getBean(beanName);
-						}
+								}
+								else {
+									isEagerInit = (factory instanceof SmartFactoryBean &&
+											((SmartFactoryBean<?>) factory).isEagerInit());
+								}
+								if (isEagerInit) {
+									getBean(beanName);
+								}
 					}
 				}
 				// 没有实现FactoryBean接口
