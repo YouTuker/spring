@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="apple" class="com.fruit.Apple" scope="singleton">
+
+	</bean>
+
+	<bean id="banana" class="com.fruit.Banana" scope="prototype">
+
+	</bean>
+	<bean id="fruit1" class="com.fruit.FruitPlate" abstract="true">
+
+		<lookup-method bean="apple" name="getFruit"></lookup-method>
+	</bean>
+	<bean id="fruit2" class="com.fruit.FruitPlate" abstract="true">
+
+		<lookup-method bean="banana" name="getFruit"></lookup-method>
+	</bean>
+</beans>
