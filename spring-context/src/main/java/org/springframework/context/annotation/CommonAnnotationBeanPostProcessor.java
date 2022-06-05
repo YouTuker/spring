@@ -158,11 +158,14 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		webServiceRefClass = loadAnnotationType("javax.xml.ws.WebServiceRef");
 		ejbClass = loadAnnotationType("javax.ejb.EJB");
 
+		// 添加@Resource注解，@Resource是jdk提供的，@Autowired是spring提供的
 		resourceAnnotationTypes.add(Resource.class);
 		if (webServiceRefClass != null) {
+			// 添加@webServiceRef注解
 			resourceAnnotationTypes.add(webServiceRefClass);
 		}
 		if (ejbClass != null) {
+			// 添加@EJB注解
 			resourceAnnotationTypes.add(ejbClass);
 		}
 	}
@@ -293,7 +296,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		// 处理@PostConstruct和@PreDestory注解
 		super.postProcessMergedBeanDefinition(beanDefinition, beanType, beanName);
-		// 这是处理@Resource的
+		// 这是处理 @Resource 的，找出所有 beanType 所有被 @Resource 标记的字段和方法封装到 InjectionMetadata 中
 		InjectionMetadata metadata = findResourceMetadata(beanName, beanType, null);
 		metadata.checkConfigMembers(beanDefinition);
 	}
@@ -355,16 +358,19 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	private InjectionMetadata buildResourceMetadata(final Class<?> clazz) {
+		// 判断当前clazz是否是候选class
 		if (!AnnotationUtils.isCandidateClass(clazz, resourceAnnotationTypes)) {
 			return InjectionMetadata.EMPTY;
 		}
 
+		// 创建InjectedElement集合对象
 		List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
 		Class<?> targetClass = clazz;
 
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
+			// 查询是否有webService,ejb,Resource的属性注解，但是不支持静态属性
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
 				if (webServiceRefClass != null && field.isAnnotationPresent(webServiceRefClass)) {
 					if (Modifier.isStatic(field.getModifiers())) {
