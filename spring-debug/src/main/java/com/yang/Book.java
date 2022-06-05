@@ -2,6 +2,8 @@ package com.yang;
 
 import org.springframework.beans.factory.FactoryBean;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author yangchuantang
  * @email uct20210715@163.com

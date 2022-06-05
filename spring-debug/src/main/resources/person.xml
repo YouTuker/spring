@@ -4,7 +4,9 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="person" class="com.Person" scope="prototype">
-		<property name="id" value="1"></property>
-		<property name="name" value="zhangsan"></property>
+<!--		<property name="id" value="1"></property>-->
+<!--		<property name="name" value="zhangsan"></property>-->
+		<constructor-arg name="id" value="1"></constructor-arg>
+		<constructor-arg name="name" value="lisi"></constructor-arg>
 	</bean>
 </beans>

@@ -508,7 +508,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
-			// 给BeanPostProcessors一个机会来返回代理来替代真正的实例
+			// 给 BeanPostProcessors 一 个机会来返回代理来替代真正的实例
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				// 代理对象已经生成，直接返回
@@ -568,7 +568,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		// 没有就创建实例
 		if (instanceWrapper == null) {
-			// 根据执行bean使用对应的策略模式创建新的实例，如，工厂方法，构造函数主动注入，简单初始化。
+			// 根据执行bean使用对应的策略模式创建新的实例，如，工厂方法，构造函数主动注入，简单初始化。完成实例化
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		// 从包装类中获取实例
@@ -612,7 +612,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object exposedObject = bean;
 		try {
 
-			// 对bean的属性进行填充，将各个属性值注入，其中，可能存在依赖与其他bean的属性，则会递归调用初始化依赖的bean
+			// 对 bean 的属性进行填充，将各个属性值注入，其中，可能存在依赖与其他bean的属性，则会递归调用初始化依赖的bean
 			populateBean(beanName, mbd, instanceWrapper);
 			// 初始化
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
@@ -1192,19 +1192,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 确认需要创建的bean实例的类可以实例化
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
-		//确保class不为空，并且访问权限是public
+		//确保 class 不为空，并且访问权限是 public
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
 
-		// 判断当前beanDefinition中是否包含实例供应器，此处相当于一个回调方法，利用回调方法来创建Bean
+		// 判断当前 beanDefinition 中是否包含实例供应器，此处相当于一个回调方法，利用回调方法来创建Bean
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
-		// 如果工厂方法不为空则使用工厂方法初始化策略，此处可以进行对象的一个创建
+		// 如果工厂方法不为空则使用工厂方法初始化策略, 此处可以进行对象的一个创建
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
@@ -1364,6 +1364,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				// 进行实例化操作，获取实例化的策略
 				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, this);
 			}
+			// 包装成BeanWrapper，为什么要包装？为了下一步，类型转换。
 			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
 			initBeanWrapper(bw);
 			return bw;
@@ -1407,7 +1408,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper autowireConstructor(
 			String beanName, RootBeanDefinition mbd, @Nullable Constructor<?>[] ctors, @Nullable Object[] explicitArgs) {
-
+//
 		return new ConstructorResolver(this).autowireConstructor(beanName, mbd, ctors, explicitArgs);
 	}
 

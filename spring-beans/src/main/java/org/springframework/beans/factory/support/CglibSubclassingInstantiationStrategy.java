@@ -71,12 +71,12 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 	private static final int METHOD_REPLACER = 2;
 
 
-	@Override
+	@Override// 动态代理的无参构造
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		return instantiateWithMethodInjection(bd, beanName, owner, null);
 	}
 
-	@Override
+	@Override// 动态代理的有参构造
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			@Nullable Constructor<?> ctor, Object... args) {
 
@@ -122,7 +122,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			}
 			else {
 				try {
-					// 通过cglib 对象来根据参数类型获取对应的构造器
+					// 通过 cglib 对象来根据参数类型获取对应的构造器
 					Constructor<?> enhancedSubclassConstructor = subclass.getConstructor(ctor.getParameterTypes());
 					// 通过构造器来获取对象
 					instance = enhancedSubclassConstructor.newInstance(args);
