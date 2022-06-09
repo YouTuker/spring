@@ -367,6 +367,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
 		Class<?> targetClass = clazz;
 
+		// do... while  进行遍历父类
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 

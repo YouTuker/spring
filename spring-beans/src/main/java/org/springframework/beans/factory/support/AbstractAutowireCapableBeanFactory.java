@@ -581,7 +581,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Allow post-processors to modify the merged bean definition.
-		// 允许beanPostProcessor去修改合并的beanDefinition
+		// 允许 beanPostProcessor 去修改合并的  beanDefinition
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
@@ -605,10 +605,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			// 为了避免后期循环依赖，可以在Bean初始化完成前将创建实例的ObjectFactory加入工厂
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
 		// Initialize the bean instance.
+		// 初始化Bean实例
 		Object exposedObject = bean;
 		try {
 
@@ -628,16 +630,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (earlySingletonExposure) {
-			Object earlySingletonReference = getSingleton(beanName, false);
-			if (earlySingletonReference != null) {
-				if (exposedObject == bean) {
-					exposedObject = earlySingletonReference;
-				}
-				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
-					String[] dependentBeans = getDependentBeans(beanName);
-					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
-					for (String dependentBean : dependentBeans) {
-						if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+							Object earlySingletonReference = getSingleton(beanName, false);
+							if (earlySingletonReference != null) {
+								if (exposedObject == bean) {
+									exposedObject = earlySingletonReference;
+								}
+								else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+									String[] dependentBeans = getDependentBeans(beanName);
+									Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
+									for (String dependentBean : dependentBeans) {
+										if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
 							actualDependentBeans.add(dependentBean);
 						}
 					}
@@ -1111,6 +1113,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition
 	 */
 	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class<?> beanType, String beanName) {
+
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
 			if (bp instanceof MergedBeanDefinitionPostProcessor) {
 				MergedBeanDefinitionPostProcessor bdp = (MergedBeanDefinitionPostProcessor) bp;
@@ -1446,13 +1449,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// PropertyValues:包含一个或多个PerpertyValue对象的容器，通常包括针对特定目标Bean的一次更新
+		// 如果mdb有PropertyValues就获取其PropertyValues
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
+		// 获取mdb的自动装配模式
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
+		// 如果自动装配模式为“按名称自动装配的Bean属性” 或者“按类型自动装配的Bean属性”
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
+			// MutablePropertyValues: PropertyValues接口的默认实现，允许对属性进行简单操作，并提供构造函数来支持从映射进行深度复制和构造
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
+			// 根据autowired的名称（如适用）添加属性值
 			if (resolvedAutowireMode == AUTOWIRE_BY_NAME) {
+				// 通过bw的PropertyDescriptor属性值，查找出对应的Bean对象，将其添加到newPvs中
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 			// Add property values based on autowire by type if applicable.
@@ -1511,18 +1521,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
+		// 获取bw中有setter方法 && 非简单类型属性 && mbd的PropertyValues中没有该pd的属性名PropertyDescript属性名数组
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
+		// 遍历属性名
 		for (String propertyName : propertyNames) {
+			// 如果该 Bean 工厂有 PropertyName 的 BeanDefinition 或外部注册的 singleton 实例
 			if (containsBean(propertyName)) {
+				// 获取该工厂中 PropertyName 的 bean 对象
 				Object bean = getBean(propertyName);
+				// 将 propertyName , bean 添加到 pvs 中
 				pvs.add(propertyName, bean);
+				// 注册 PropertyName 与 beanName 的依赖关系
 				registerDependentBean(propertyName, beanName);
+				// 打印跟踪日记
 				if (logger.isTraceEnabled()) {
 					logger.trace("Added autowiring by name from bean name '" + beanName +
 							"' via property '" + propertyName + "' to bean named '" + propertyName + "'");
 				}
 			}
 			else {
+				// 打印跟踪日记
 				if (logger.isTraceEnabled()) {
 					logger.trace("Not autowiring property '" + propertyName + "' of bean '" + beanName +
 							"' by name: no matching bean found");
@@ -1593,15 +1611,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see org.springframework.beans.BeanUtils#isSimpleProperty
 	 */
 	protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
+		// TreeSet:TreeSet底层是二叉树，可以对对象元素进行排序，但是自定义需要实现comparable接口，重写comparaTo()方法
 		Set<String> result = new TreeSet<>();
+		// 获取mdb的所有属性值
 		PropertyValues pvs = mbd.getPropertyValues();
+		// PropertyDesctiptor:表示JavaBean类通过存储器导出一个属性,获取bw的所有属性描述对象
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
+		// 遍历属性描述对象
 		for (PropertyDescriptor pd : pds) {
+			// 如果 pd有写入属性方法 && 改pd不是被排除在依赖项检查之外 && pvs没有该pd的属性名 && pd的属性类型不是简单值类型
 			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
 					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
+				// 将pdd的属性名添加到result中
 				result.add(pd.getName());
 			}
 		}
+		// 将result转换成数组
 		return StringUtils.toStringArray(result);
 	}
 
