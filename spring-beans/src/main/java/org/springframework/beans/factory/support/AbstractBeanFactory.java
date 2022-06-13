@@ -346,8 +346,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// 原型模式的bean对象创建
 				else if (mbd.isPrototype()) {
 					// It's a prototype -> create a new instance.
+					// 定义prototype实例
 					Object prototypeInstance = null;
 					try {
+						// 创建prototype对象前的准备工作，默认实现将beanName添加到prototypesCurrentlyIncreation中
 						beforePrototypeCreation(beanName);
 						// 原型模式对象的创建
 						prototypeInstance = createBean(beanName, mbd, args);

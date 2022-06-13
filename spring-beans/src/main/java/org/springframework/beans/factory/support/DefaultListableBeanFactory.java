@@ -1237,15 +1237,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				ObjectProvider.class == descriptor.getDependencyType()) {
 			return new DependencyObjectProvider(descriptor, requestingBeanName);
 		}
+		//
 		else if (javaxInjectProviderClass == descriptor.getDependencyType()) {
 			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
 		}
 		else {
+			// 尝试获取延迟加载代理对象
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
 					descriptor, requestingBeanName);
+			// 如果result为null,即表示现在需要得到候选Bean对象
 			if (result == null) {
+				// 解析出与descriptor所包装的对象匹配的候选Bean对象
 				result = doResolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
 			}
+			// 将与 Descriptor 所包装的对象匹配的候选 Bean 对象 [result] 返回回去
 			return result;
 		}
 	}

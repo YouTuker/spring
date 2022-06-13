@@ -108,6 +108,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
+	// 存储依赖关系的map
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
@@ -137,9 +138,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+			// 将映射关系添加到单例对象的高速缓存中
 			this.singletonObjects.put(beanName, singletonObject);
+			// 移除beanName在单例工厂缓存中的数据
 			this.singletonFactories.remove(beanName);
+			// 移除beanName在早期单例对象的高速缓存的数据
 			this.earlySingletonObjects.remove(beanName);
+			// 将beanName添加到已注册的单例集中
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -424,17 +429,23 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param dependentBeanName the name of the dependent bean
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+		// 获取name的最终别名或者是全类名
 		String canonicalName = canonicalName(beanName);
 
+		// 使用存储bean名词到该bean名所需要的bean名 的map为锁，保证线程安全。
 		synchronized (this.dependentBeanMap) {
+			// 获取canonicalName对应的用于存储依赖Bean名的Set集合，如果没有就创建一个linkedHashSet，并与canonicalName绑定到dependentBeans中
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
+			// 如果dependendBeans已经添加过来了DependentBeanName，就结束该方法，不执行后面操作。
 			if (!dependentBeans.add(dependentBeanName)) {
 				return;
 			}
 		}
 
+		// 使用Bean依赖关系map作为锁，保证线程安全
 		synchronized (this.dependenciesForBeanMap) {
+			// 添加dependendtBeanName依赖于cannoicalName的映射关系到存储bean名到依赖于该bean名的bean名的 Map中
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
 			dependenciesForBean.add(canonicalName);
